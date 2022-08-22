@@ -1,0 +1,110 @@
+DATA:
+  train_name: pascal
+  test_name: default
+  data_root: ../dataset/VOCdevkit/VOC2012
+  train_split: 0
+  test_split: default
+  train_list: lists/pascal/train.txt
+  val_list: lists/pascal/val.txt
+  num_classes_tr: 2
+  num_classes_val: 5
+  use_split_coco: False
+  workers: 2
+  image_size: 473
+  padding_label: 255
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+  scale_min: 0.5
+  scale_max: 2.0
+  rot_min: -10
+  rot_max: 10
+
+  padding: avg              # default: avg
+  augmentations: ['resize']
+  meta_aug: True
+  aug_th: [0.15, 0.30]
+  aug_type: 0               # default: 0
+  att_type: 1               # original: 0, new: 1, both: 2, adaptive: 3
+
+TRAIN:
+  resume_weight: pretrained/pascal/split0/pspnet_resnet50/best.pth
+  ckpt_path: checkpoints/
+  batch_size: 1
+  epochs: 5
+  log_freq: 200
+  lr:                 # random lr search (log uniform)
+  lr_cls: 0.1         # classifier lr
+  lr_att:             # att fusion lr
+  lr_meta: 0.0015     # meta model lr
+  lr_mode:            # per-block decayed lr
+  lr_decay:           # decay factor gamma
+  mixup: False
+  lr_stepsize: 30
+  momentum: 0.9
+  gamma: 0.1
+  nesterov: True
+  weight_decay: 0.0001
+  main_optim: SGD
+  scheduler: cosine
+  milestones: [40, 70]
+  iter_per_epoch: 
+  adapt_iter: 100
+  per_epoch_val: 4
+  miou_grp_size: 4
+
+MODEL:
+  arch: resnet
+  backbone: resnet
+  layers: 50
+  zoom_factor: 8
+  pretrained: False
+  final_pool: False
+  m_scale: False
+  use_ppm: True
+  rmid: [3, 4]
+  dropout: 0.1
+  bins: [1, 2, 3, 6]
+  bottleneck_dim: 512
+  encoder_blocks: 5
+  encoder_dim: 512
+  decoder_dim: 
+  patch_size: 16
+  extra_tokens_num: 0
+  decoder: 
+  feats_type: cnn
+  inner_loss: wce
+  meta_loss: wdc
+  meta_model: aug
+  norm_s: False
+  norm_q: True
+
+  loss_idx: 1
+  use_amp: True
+  wa: True
+  agg: cat
+  red_dim: False
+  conv4d: red
+  proj_drop: 0.5
+  att_drop: 0.5
+  att_wt: 0.1
+  att_ad: False       # adaptive att_wt 
+  temp: 10.0
+
+Classifier:
+  dist: dot
+  cls_type: oooo
+
+EVALUATION:
+  episodic: True
+  episodic_val: 
+  shot: 1
+  random_shot: False
+  batch_size_val: 
+  manual_seed: 42
+  ckpt_used: best
+  test_num: 1000
+  FB_param_noise: 0
+  smoothing: True
+  n_runs: 1
+  save_oracle: False
+  save_flag: False
